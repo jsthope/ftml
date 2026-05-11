@@ -131,7 +131,27 @@ fn try_consume_fn<'r, 't>(
                                 break 'row;
                             }
 
-                            // Otherwise, the cell is finished, and we proceed to the next one.
+                            // Trailing whitespace after the final `||` of a row:
+                            // peek past it to see whether the row or table actually ends.
+                            Token::Whitespace => {
+                                match parser.look_ahead(1).map(|t| t.token) {
+                                    Some(Token::ParagraphBreak)
+                                    | Some(Token::InputEnd)
+                                    | None => {
+                                        build_cell!();
+                                        build_row!();
+                                        parser.step_n(2)?;
+                                        break 'table;
+                                    }
+                                    Some(Token::LineBreak) => {
+                                        build_cell!();
+                                        parser.step_n(3)?;
+                                        break 'row;
+                                    }
+                                    _ => break 'cell,
+                                }
+                            }
+
                             _ => break 'cell,
                         }
                     }
