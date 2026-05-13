@@ -19,6 +19,7 @@
  */
 
 use std::fmt::{self, Display};
+use unidecode::unidecode;
 use wikidot_normalize::normalize;
 
 /// Represents a reference to a page on the wiki, as used by include notation.
@@ -71,8 +72,8 @@ impl PageRef {
         S2: AsRef<str>,
     {
         let (page, extra) = Self::split_page(page.as_ref());
-        let mut site = site.into();
-        let mut page = str!(page);
+        let mut site = unidecode(site.into().as_ref());
+        let mut page = unidecode(page);
         let extra = extra.map(String::from);
         normalize(&mut site);
         normalize(&mut page);
@@ -91,7 +92,7 @@ impl PageRef {
         S: AsRef<str>,
     {
         let (page, extra) = Self::split_page(page.as_ref());
-        let mut page = str!(page);
+        let mut page = unidecode(page);
         let extra = extra.map(String::from);
         normalize(&mut page);
         PageRef {
@@ -264,6 +265,16 @@ fn page_ref() {
         ":scp-wiki:deleted:secret:fragment:page",
         PageRef::page_and_site("scp-wiki", "deleted:secret:fragment:page"),
     );
+
+    // Transliteration (WJ-1068): non-ASCII page slugs are transliterated
+    // to ASCII so the generated URL is wikidot-compatible.
+    let translit = PageRef::parse("документ").expect("Cyrillic page name");
+    assert_eq!(translit.page(), "dokument");
+    assert_eq!(translit.site(), None);
+
+    let translit = PageRef::parse(":ru:документ").expect("Cyrillic on off-site");
+    assert_eq!(translit.site(), Some("ru"));
+    assert_eq!(translit.page(), "dokument");
 }
 
 #[cfg(test)]
