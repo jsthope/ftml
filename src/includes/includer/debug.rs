@@ -90,7 +90,7 @@ impl<'t> Display for MapWrap<'_, 't> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Get all entries and sort by key
         let mut entries: Vec<(&Cow<'t, str>, &Cow<'t, str>)> = self.0.iter().collect();
-        entries.sort_by(|(key1, _), (key2, _)| key1.cmp(key2));
+        entries.sort_by_key(|(key, _)| *key);
 
         // Write all entries
         write!(f, "{{")?;
