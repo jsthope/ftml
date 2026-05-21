@@ -68,13 +68,13 @@ fn html_id() {
 
     rand.generate_html_id_into(&mut buffer);
     assert_eq!(
-        buffer, "wj-id-bW5Ql2DLZtnd9s18",
+        buffer, "wj-id-zvGvLlhGI6VEZFKj",
         "Generated HTML ID doesn't match expected",
     );
 
     let html_id = rand.generate_html_id();
     assert_eq!(
-        html_id, "wj-id-ePZbhugrfP89c4Fk",
+        html_id, "wj-id-e9pQyKaPmLnulpgn",
         "Generated HTML ID doesn't match expected",
     );
 }
