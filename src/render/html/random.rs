@@ -19,15 +19,8 @@
  */
 
 use cfg_if::cfg_if;
-use rand::{Rng, SeedableRng, distr::Alphanumeric, rngs::SmallRng};
-use std::iter;
-
-#[cfg(test)]
-const TEST_RANDOM_SEED: [u8; 32] = [
-    0x53, 0x43, 0x50, 0x2d, 0x31, 0x37, 0x33, 0x3a, 0x20, 0x4d, 0x6f, 0x76, 0x65, 0x64,
-    0x20, 0x74, 0x6f, 0x20, 0x53, 0x69, 0x74, 0x65, 0x2d, 0x31, 0x39, 0x20, 0x31, 0x39,
-    0x39, 0x33, 0x2e, 0x0a,
-];
+use rand::distr::{Alphanumeric, SampleString};
+use rand::rngs::SmallRng;
 
 #[derive(Debug)]
 pub struct Random {
@@ -39,9 +32,10 @@ impl Default for Random {
     fn default() -> Self {
         cfg_if! {
             if #[cfg(test)] {
-                let rng = SmallRng::from_seed(TEST_RANDOM_SEED);
+                use rand::SeedableRng;
+                let rng = SmallRng::seed_from_u64(1);
             } else {
-                let rng = SmallRng::from_rng(&mut rand::rng());
+                let rng = rand::make_rng();
             }
         }
 
@@ -52,13 +46,7 @@ impl Default for Random {
 impl Random {
     pub fn generate_html_id_into(&mut self, buffer: &mut String) {
         buffer.push_str("wj-id-");
-
-        let char_stream = iter::repeat(())
-            .map(|_| self.rng.sample(Alphanumeric))
-            .map(char::from)
-            .take(16);
-
-        buffer.extend(char_stream);
+        Alphanumeric.append_string(&mut self.rng, buffer, 16);
     }
 
     pub fn generate_html_id(&mut self) -> String {
