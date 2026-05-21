@@ -63,6 +63,13 @@ termcolor = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.4", features = ["wasm_js"] }
+# Ugly annoying bullshit because downstream packages depend on
+# getrandom v3, but for WASM we need this feature flag or only
+# these versions of getrandom won't be able to get OS entropy.
+#
+# I hate this and we should remove this once all child dependencies
+# stop depending on this version. Ugh.
+getrandom3 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
 self_cell = "1.0"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 web-sys = { version = "0.3", features = ["console"] }
