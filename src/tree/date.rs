@@ -338,32 +338,33 @@ fn append_relative_time(
     let formatter = match unit {
         RelativeTimeUnit::Second => RelativeTimeFormatter::try_new_long_second(
             prefs,
-            RelativeTimeFormatterOptions {
-                numeric: Numeric::Always,
-            },
+            relative_time_fmt_options(Numeric::Always),
         ),
         RelativeTimeUnit::Minute => RelativeTimeFormatter::try_new_long_minute(
             prefs,
-            RelativeTimeFormatterOptions {
-                numeric: Numeric::Always,
-            },
+            relative_time_fmt_options(Numeric::Always),
         ),
         RelativeTimeUnit::Hour => RelativeTimeFormatter::try_new_long_hour(
             prefs,
-            RelativeTimeFormatterOptions {
-                numeric: Numeric::Always,
-            },
+            relative_time_fmt_options(Numeric::Always),
         ),
         RelativeTimeUnit::Day => RelativeTimeFormatter::try_new_long_day(
             prefs,
-            RelativeTimeFormatterOptions {
-                numeric: Numeric::Auto,
-            },
+            relative_time_fmt_options(Numeric::Auto),
         ),
     }
     .map_err(localization_error)?;
 
     append_normalized_display(rendered, formatter.format(Decimal::from(value)))
+}
+
+/// Helper to create a `RelativeTimeFormatterOptions`.
+/// Because the struct is non-exhaustive, we cannot use the struct syntax to
+/// create new instances here.
+fn relative_time_fmt_options(numeric: Numeric) -> RelativeTimeFormatterOptions {
+    let mut options = RelativeTimeFormatterOptions::default();
+    options.numeric = numeric;
+    options
 }
 
 fn relative_time_value(datetime: OffsetDateTime) -> (i64, RelativeTimeUnit) {
