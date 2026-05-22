@@ -8,7 +8,7 @@ keywords = ["wikidot", "wikijump", "ftml", "parsing", "html"]
 categories = ["parser-implementations"]
 exclude = [".gitignore", ".editorconfig"]
 
-version = "1.41.0"
+version = "1.42.0"
 authors = ["Emmie Smith <emmie.maeda@gmail.com>"]
 edition = "2024"
 
@@ -27,19 +27,19 @@ mathml   = ["html", "latex2mathml"]
 cfg-if = "1"
 enum-map = "2"
 entities = "1"
-icu_calendar = "2.1"
-icu_decimal = "2.1"
-icu_datetime = { version = "2.1", features = ["compiled_data"] }
-icu_experimental = { version = "0.4", features = ["compiled_data"] }
-icu_locale = "2.1"
+icu_calendar = "2.2"
+icu_decimal = "2.2"
+icu_datetime = { version = "2.2", features = ["compiled_data"] }
+icu_experimental = { version = "0.5", features = ["compiled_data"] }
+icu_locale = "2.2"
 latex2mathml = { version = "0.2", optional = true }
-lightningcss = { version = "1.0.0-alpha.67", optional = true }
+lightningcss = { version = "1.0.0-alpha.70", optional = true }
 log = "0.4"
 maplit = "1"
 pest = "2"
 pest_derive = "2"
-rand = { version = "0.9", features = ["small_rng"] }
-ref-map = "0.1"
+rand = "0.10"
+ref-map = "0.2"
 regex = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -62,7 +62,14 @@ proptest = "1"
 termcolor = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { version = "0.3", features = ["wasm_js"] }
+getrandom = { version = "0.4", features = ["wasm_js"] }
+# Ugly annoying bullshit because downstream packages depend on
+# getrandom v3, but for WASM we need this feature flag or only
+# these versions of getrandom won't be able to get OS entropy.
+#
+# I hate this and we should remove this once all child dependencies
+# stop depending on this version. Ugh.
+getrandom3 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
 self_cell = "1.0"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 web-sys = { version = "0.3", features = ["console"] }
