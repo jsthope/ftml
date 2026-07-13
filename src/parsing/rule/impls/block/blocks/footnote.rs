@@ -106,6 +106,14 @@ fn parse_footnote_block<'r, 't>(
     assert!(!flag_score, "Footnote block doesn't allow score flag");
     assert_block_name(&BLOCK_FOOTNOTE_BLOCK, name);
 
+    // Check footnote flag
+    //
+    // This is true if we're a [[footnote]] inside a [[footnote]],
+    // which is not allowed.
+    if parser.in_footnote() {
+        return Err(parser.make_err(ParseErrorKind::FootnotesNested));
+    }
+
     // Parse arguments
     let mut arguments = parser.get_head_map(&BLOCK_FOOTNOTE_BLOCK, in_head)?;
 
