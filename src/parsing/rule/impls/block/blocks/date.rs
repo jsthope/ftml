@@ -20,9 +20,7 @@
 
 use super::prelude::*;
 use crate::tree::DateItem;
-use regex::Regex;
 use std::borrow::Cow;
-use std::sync::LazyLock;
 use time::format_description::well_known::{Iso8601, Rfc2822, Rfc3339};
 use time::{Date, OffsetDateTime, PrimitiveDateTime, UtcOffset};
 
@@ -159,13 +157,11 @@ fn parse_date(value: &str) -> Result<DateItem, DateParseError> {
 
 /// Parse the timezone based on the specifier string.
 fn parse_timezone(value: &str) -> Result<UtcOffset, DateParseError> {
-    static TIMEZONE_REGEX: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new(r"^(\+|-)?([0-9]{1,2}):?([0-9]{2})?$").unwrap());
-
     debug!("Parsing possible timezone value '{value}'");
 
     // Try hours / minutes (via regex)
-    if let Some(captures) = TIMEZONE_REGEX.captures(value) {
+    let timezone_regex = regex!(r"^(\+|-)?([0-9]{1,2}):?([0-9]{2})?$");
+    if let Some(captures) = timezone_regex.captures(value) {
         // Get sign (+1 or -1)
         let sign = match captures.get(1) {
             None => 1,

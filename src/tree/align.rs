@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use regex::Regex;
 use std::convert::TryFrom;
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -82,12 +81,7 @@ pub struct FloatAlignment {
 
 impl FloatAlignment {
     pub fn parse(name: &str) -> Option<Self> {
-        use std::sync::LazyLock;
-
-        static IMAGE_ALIGNMENT_REGEX: LazyLock<Regex> =
-            LazyLock::new(|| Regex::new(r"^[fF]?([<=>])").unwrap());
-
-        IMAGE_ALIGNMENT_REGEX
+        regex!(r"^[fF]?([<=>])")
             .find(name)
             .and_then(|mtch| FloatAlignment::try_from(mtch.as_str()).ok())
     }

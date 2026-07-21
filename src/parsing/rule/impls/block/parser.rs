@@ -28,11 +28,6 @@ use crate::parsing::{
     gather_paragraphs,
 };
 use crate::tree::Element;
-use regex::Regex;
-use std::sync::LazyLock;
-
-static ARGUMENT_KEY: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"[A-Za-z0-9_\-]+").unwrap());
 
 impl<'r, 't> Parser<'r, 't>
 where
@@ -291,6 +286,7 @@ where
                 let key = {
                     let start = self.current();
                     let mut args_finished = false;
+                    let argument_key_regex = regex!(r"[A-Za-z0-9_\-]+");
 
                     loop {
                         let current = self.current();
@@ -308,7 +304,7 @@ where
                             | Token::Equals => break,
 
                             // Continue iterating to gather key
-                            _ if ARGUMENT_KEY.is_match(current.slice) => {
+                            _ if argument_key_regex.is_match(current.slice) => {
                                 self.step()?;
                             }
 
