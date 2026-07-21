@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use regex::Regex;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 use unicase::UniCase;
@@ -184,9 +183,6 @@ pub static BOOLEAN_ATTRIBUTES: LazyLock<HashSet<UniCase<&'static str>>> =
 pub static URL_ATTRIBUTES: LazyLock<HashSet<UniCase<&'static str>>> =
     LazyLock::new(|| hashset_unicase!["href", "src"]);
 
-static ATTRIBUTE_SUFFIX_SAFE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"[a-zA-z0-9\-]+").unwrap());
-
 pub const SAFE_ATTRIBUTE_PREFIXES: [&str; 2] = ["aria-", "data-"];
 
 pub fn is_safe_attribute(attribute: UniCase<&str>) -> bool {
@@ -194,8 +190,9 @@ pub fn is_safe_attribute(attribute: UniCase<&str>) -> bool {
         return true;
     }
 
+    let attribute_suffix_safe = regex!(r"[a-zA-z0-9\-]+");
     for prefix in &SAFE_ATTRIBUTE_PREFIXES {
-        if attribute.starts_with(prefix) && ATTRIBUTE_SUFFIX_SAFE.is_match(&attribute) {
+        if attribute.starts_with(prefix) && attribute_suffix_safe.is_match(&attribute) {
             return true;
         }
     }

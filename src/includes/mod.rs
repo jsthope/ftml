@@ -42,17 +42,6 @@ use crate::tree::VariableMap;
 use regex::{Regex, RegexBuilder};
 use std::sync::LazyLock;
 
-static INCLUDE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    RegexBuilder::new(r"^\[\[\s*include\s+")
-        .case_insensitive(true)
-        .multi_line(true)
-        .dot_matches_new_line(true)
-        .build()
-        .unwrap()
-});
-static VARIABLE_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\{\$(?P<name>[a-zA-Z0-9_\-]+)\}").unwrap());
-
 /// Replaces the include blocks in a string with the content of the pages referenced by those
 /// blocks.
 pub fn include<'t, I, E, F>(
@@ -65,6 +54,15 @@ where
     I: Includer<'t, Error = E>,
     F: FnOnce() -> E,
 {
+    static INCLUDE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+        RegexBuilder::new(r"^\[\[\s*include\s+")
+            .case_insensitive(true)
+            .multi_line(true)
+            .dot_matches_new_line(true)
+            .build()
+            .unwrap()
+    });
+
     if !settings.enable_page_syntax {
         debug!("Includes are disabled for this input, skipping");
 
@@ -167,9 +165,10 @@ where
 /// Read <https://www.wikidot.com/doc-wiki-syntax:include> for more details.
 fn replace_variables(content: &mut String, variables: &VariableMap) {
     let mut matches = Vec::new();
+    let variable_regex = regex!(r"\{\$(?P<name>[a-zA-Z0-9_\-]+)\}");
 
     // Find all variables
-    for capture in VARIABLE_REGEX.captures_iter(content) {
+    for capture in variable_regex.captures_iter(content) {
         let mtch = capture.get(0).unwrap();
         let name = &capture["name"];
 

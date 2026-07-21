@@ -91,6 +91,9 @@ extern crate maplit;
 extern crate pest_derive;
 
 #[macro_use]
+extern crate regex;
+
+#[macro_use]
 extern crate serde;
 
 #[macro_use]

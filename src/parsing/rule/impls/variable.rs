@@ -19,11 +19,6 @@
  */
 
 use super::prelude::*;
-use regex::Regex;
-use std::sync::LazyLock;
-
-static VARIABLE_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\{\$(.+)\}").unwrap());
 
 pub const RULE_VARIABLE: Rule = Rule {
     name: "variable",
@@ -37,8 +32,7 @@ fn try_consume_fn<'r, 't>(
     debug!("Consuming token by placing variable contents");
 
     let ExtractedToken { slice, .. } = parser.current();
-
-    let variable = VARIABLE_REGEX
+    let variable = regex!(r"\{\$(.+)\}")
         .captures(slice)
         .expect("Variable regex didn't match")
         .get(1)
