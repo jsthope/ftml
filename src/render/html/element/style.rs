@@ -28,7 +28,7 @@ use lightningcss::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
 /// escaping. The trailing space terminates the hexadecimal CSS escape.
 fn escape_style_end_tags(css: &mut String) {
     const HTML_END_TAG_START: &str = "</";
-    const CSS_ESCAPED_END_TAG_START: &str = r"\3c /";
+    const CSS_ESCAPED_END_TAG_START: &str = r"\3c/";
 
     let mut offset = 0;
     while let Some(relative_start) = css[offset..].find(HTML_END_TAG_START) {
