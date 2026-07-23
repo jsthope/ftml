@@ -73,8 +73,10 @@ pub fn render_style(ctx: &mut HtmlContext, input_css: &str) {
     escape_style_end_tags(&mut output_css);
 
     ctx.html().style().inner(|ctx| {
-        // SAFETY: `escape_style_end_tags` prevents CSS from closing the
-        //         surrounding HTML style element before raw insertion.
+        // SAFETY: LightningCSS parses and serializes the stylesheet removing
+        //         invalid CSS constructs. `escape_style_end_tags` additionally
+        //         neutralizes any `</` retained in valid CSS so raw insertion
+        //         cannot terminate the surrounding HTML `<style>` element.
         ctx.push_raw_str(&output_css);
     });
 }
